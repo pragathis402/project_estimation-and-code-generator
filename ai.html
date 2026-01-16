@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Estimation Chatbot with Voice</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+      background-size: 400% 400%;
+      animation: bg-pan 16s ease infinite;
+    }
+
+    @keyframes bg-pan {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .background-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .element {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.2;
+      animation: floatUp 15s infinite linear;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      will-change: transform, opacity;
+    }
+
+    .element.chart {
+        border-radius: 4px;
+        background: linear-gradient(45deg, rgba(71, 118, 230, 0.1), rgba(142, 84, 233, 0.15));
+        box-shadow: 0 0 10px rgba(71, 118, 230, 0.2);
+    }
+
+    .element.line {
+        height: 2px;
+        border-radius: 1px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+        opacity: 0.1;
+        box-shadow: none;
+    }
+    
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg) scale(0.5);
+        opacity: 0;
+      }
+      20% { opacity: 0.2; }
+      100% {
+        transform: translateY(-120vh) translateX(var(--x-drift)) rotate(var(--rotation)) scale(var(--scale));
+        opacity: 0;
+      }
+    }
+    
+    .chat-container {
+      width: 90%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease-out;
+      perspective: 1000px;
+    }
+
+    .chat-container:hover {
+        transform: translateY(-5px) rotateX(1deg) rotateY(-1deg);
+    }
+    
+    header {
+      background: linear-gradient(90deg, #4776E6, #8E54E9);
+      color: #fff;
+      padding: 18px;
+      text-align: center;
+      position: relative;
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease infinite;
+      text-shadow: 0 0 8px rgba(255,255,255,0.7), 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    @keyframes gradientShift {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    
+    header h2 {
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .ai-indicator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    
+    .ai-indicator .pulse {
+      width: 10px;
+      height: 10px;
+      background: #4CAF50;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+        opacity: 0.7;
+      }
+      70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.8);
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+        opacity: 0.7;
+      }
+    }
+
+    /* ADDED: Navigation buttons styles */
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .nav-buttons button {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+    
+    .nav-buttons button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    main {
+      padding: 16px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="rgba(237, 242, 247, 0.2)" width="100" height="100"/><path fill="rgba(66, 153, 225, 0.1)" d="M0 0L100 100" stroke-width="0"/></svg>');
+    }
+
+    main::-webkit-scrollbar {
+      width: 8px;
+    }
+    main::-webkit-scrollbar-track {
+      background: rgba(230, 230, 230, 0.5);
+      border-radius: 10px;
+    }
+    main::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #8E54E9, #4776E6);
+      border-radius: 10px;
+    }
+    main::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #7d44d4, #3662c9);
+    }
+    
+    .message {
+      margin: 8px 0;
+      padding: 12px 16px;
+      border-radius: 18px;
+      max-width: 85%;
+      line-height: 1.5;
+      position: relative;
+      animation: slideIn 0.4s ease-out forwards;
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .user {
+      background: #4776E6;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+      background: linear-gradient(135deg, #4776E6, #6a5acd);
+      animation: slideInRight 0.4s ease-out forwards;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .message:hover {
+        transform: scale(1.015);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .bot {
+      background: #edf2f7;
+      color: #2d3748;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+      animation: slideIn 0.4s ease-out forwards;
+    }
+    
+    .bot::before {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      left: -8px;
+      bottom: 0;
+      border: 8px solid transparent;
+      border-right-color: #edf2f7;
+      border-left: 0;
+    }
+    
+    .user::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      right: -8px;
+      bottom: 0;
+      border: 8px solid transparent;
+      border-left-color: #4776E6;
+      border-right: 0;
+    }
+    
+    .message-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 5px;
+      text-align: right;
+    }
+    
+    .followups {
+      margin: 8px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .followups button {
+      background: rgba(66, 153, 225, 0.1);
+      border: 1px solid rgba(66, 153, 225, 0.3);
+      border-radius: 16px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #2b6cb0;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .followups button:hover {
+      background: rgba(66, 153, 225, 0.2);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 4px 10px rgba(43, 108, 176, 0.25);
+      color: #3f88c5;
+    }
+
+    .followups button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+    }
+
+    .followups button:active::before {
+        width: 200%;
+        height: 200%;
+        opacity: 1;
+        transition: none;
+    }
+    
+    footer {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    
+    footer input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #cbd5e0;
+      border-radius: 24px;
+      outline: none;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    footer input:focus {
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+      animation: inputFocusGlow 1.5s infinite alternate;
+    }
+    
+    @keyframes inputFocusGlow {
+        from { box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2); }
+        to { box-shadow: 0 0 0 6px rgba(142, 84, 233, 0.3); }
+    }
+
+    footer button {
+      margin-left: 10px;
+      padding: 12px 20px;
+      background: linear-gradient(90deg, #4776E6, #8E54E9);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    footer button:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 15px rgba(71, 118, 230, 0.5);
+    }
+    
+    footer button:active {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .suggestion-chips {
+      display: flex;
+      padding: 0 15px 15px;
+      overflow-x: auto;
+      background: #fff;
+      gap: 10px;
+    }
+    
+    .suggestion-chips .chip {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      background: rgba(66, 153, 225, 0.1);
+      border-radius: 18px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #2b6cb0;
+      transition: all 0.2s;
+    }
+    
+    .suggestion-chips .chip:hover {
+      background: rgba(66, 153, 225, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(43, 108, 176, 0.15);
+    }
+    
+    .typing-indicator {
+      display: flex;
+      padding: 12px 16px;
+      background: #edf2f7;
+      border-radius: 18px;
+      align-self: flex-start;
+      margin: 8px 0;
+      border-bottom-left-radius: 5px;
+    }
+    
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: #4299e1;
+      border-radius: 50%;
+      margin: 0 2px;
+      opacity: 0.6;
+    }
+    
+    .typing-indicator span:nth-child(1) {
+      animation: bounce 1.2s infinite 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+      animation: bounce 1.2s infinite 0.4s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+      animation: bounce 1.2s infinite 0.6s;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); opacity: 1; }
+    }
+    
+    @media (max-width: 600px) {
+      .chat-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+      }
+      
+      main {
+        height: calc(100% - 155px);
+      }
+    }
+
+    .voice-controls {
+      display: flex;
+      justify-content: center;
+      padding: 10px 15px;
+      background: #fff;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    #startBtn {
+      padding: 12px 24px;
+      background: linear-gradient(90deg, #4776E6, #8E54E9);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    #startBtn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 15px rgba(71, 118, 230, 0.5);
+    }
+    
+    #startBtn:active {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="background-elements"></div> 
+<div class="chat-container">
+  <header>
+    <h2>Software Estimation Bot</h2>
+    <div class="ai-indicator">
+      <div class="pulse"></div>
+      <span>AI Active</span>
+    </div>
+    <!-- ADDED: Navigation buttons -->
+    <div class="nav-buttons">
+      <button id="codeGeneratorBtn">Code Generator</button>
+      <button id="projectEstimationBtn">Project Estimation</button>
+    </div>
+  </header>
+  <main id="chat-box">
+    <div class="message bot">
+        Hello! I'm your AI estimation assistant. I can help with software project cost, duration, and team size estimation. How can I assist you today?
+        <div class="message-time">Just now</div>
+      </div>
+  </main>
+  
+  <div class="voice-controls">
+    <button id="startBtn">🎤 Speak</button>
+  </div>
+  
+  <footer>
+    <input id="user-input" placeholder="Ask about cost, duration, team size…" />
+    <button id="send-btn">Send</button>
+  </footer>
+</div>
+<script>
+    // ADDED: Custom response for "hello"
+    const customResponses = {
+      "hello": "Hello! I'm your AI assistant for software project estimation. How can I help you today?",
+      "hi": "Hello! I'm your AI assistant for software project estimation. How can I help you today?",
+      "hey": "Hello! I'm your AI assistant for software project estimation. How can I help you today?"
+    };
+
+    const dataset = [
+  {
+    q: "what is software project cost estimation",
+    a: "It's the process of determining the approximate cost and resources required for a software project, based on scope, complexity, technology, team, and other factors.",
+    followups: [
+      "What models can we use for cost estimation?",
+      "What factors influence cost?",
+      "How to estimate time for a project?"
+    ]
+  },
+  {
+    q: "what is time estimation in software projects",
+    a: "It refers to predicting how long the project (or parts of it) will take — number of hours, days, weeks, or months — considering all activities from planning, design, implementation, testing, deployment, etc.",
+    followups: [
+      "how to estimate when requirements are unclear",
+      "what is three-point estimation or pert",
+      "how to forecast schedule with dependencies"
+    ]
+  },
+  {
+    q: "what factors influence cost and time estimates",
+    a: "Some key factors: requirement clarity, project scope, size/complexity, technology stack, team skill/experience, dependencies, risk & uncertainty, external integrations, testing & QA, rework.",
+    followups: [
+      "how does team experience affect estimates",
+      "what are direct costs vs indirect costs",
+      "how to handle risk and uncertainty in estimates"
+    ]
+  },
+  {
+    q: "what are common estimation techniques",
+    a: "Techniques include: analogous estimation, parametric estimation, bottom-up estimation, top-down estimation, expert judgement, three-point / PERT, function points / use case points, proxy-based methods, COCOMO, Putnam model.",
+    followups: [
+      "what is analogous estimation",
+      "what is parametric estimation",
+      "what is bottom-up estimation",
+      "how do function points or use case points work",
+      "what is the cocomo model",
+      "what is the putnam model",
+      "what is three-point estimation or pert",
+      "what is proxy-based estimating"
+    ]
+  },
+  {
+    q: "how do you estimate when requirements are unclear",
+    a: "Use ranges (optimistic / most likely / pessimistic), buffer time, experimental spikes or prototypes, incremental estimation, frequent review and update of estimates as requirements clarify.",
+    followups: [
+      "how to estimate experimental parts",
+      "what is the cone of uncertainty",
+      "how accurate are early estimates"
+    ]
+  },
+  {
+    q: "what is bottom-up estimation",
+    a: "Breaking a project into smallest possible tasks, estimating each task individually, then aggregating estimates for all tasks to get total time / cost.",
+    followups: [
+      "what is a work breakdown structure",
+      "how do you estimate non-development work"
+    ]
+  },
+  {
+    q: "what is analogous estimation",
+    a: "Estimating based on past similar projects, using comparisons to derive estimates for the new project (with adjustments for differences).",
+    followups: ["how to use historical data for estimation"]
+  },
+  {
+    q: "what is parametric estimation",
+    a: "Uses parameters or variables (e.g. cost per function point, cost per LOC) and mathematical models to estimate time/cost based on quantity and known productivity rates.",
+    followups: [
+      "what is the cocomo model",
+      "what is the putnam model",
+      "how to calculate effort"
+    ]
+  },
+  {
+    q: "how do function points or use case points work",
+    a: "They measure software size/functionality by evaluating user-visible features (e.g. inputs, outputs, interfaces), then apply weighting factors and adjust for technical/environmental complexity. Then use that size to derive effort/time.",
+    followups: ["how to fix functional points"]
+  },
+  {
+    q: "what is the cocomo model",
+    a: "COCOMO (Constructive Cost Model) is a parametric cost and effort estimation model that, given software size, applies cost drivers to predict effort (person-months), cost & schedule.",
+    followups: [
+      "which cocomo mode suits my project",
+      "how to calculate effort",
+      "cocomo organic lines of code",
+      "cocomo semi detached lines of code",
+      "cocomo embedded lines of code"
+    ]
+  },
+  {
+    q: "what is the putnam model",
+    a: "An empirical model (also known as the SLIM model) that relates project size, productivity, effort, and schedule using a non-linear equation. Useful for larger projects when historical data is available.",
+    followups: ["how to calculate effort"]
+  },
+  {
+    q: "how do you estimate in agile environments",
+    a: "Agile teams often use story points, velocity, planning poker, sprint planning, and incremental delivery. They update/re-estimate as sprints progresses.",
+    followups: [
+      "what is planning poker",
+      "what is realistic team velocity in agile",
+      "team velocity agile"
+    ]
+  },
+  {
+    q: "what is planning poker",
+    a: "A consensus-based estimation technique used in Agile: team members assign story points to tasks/stories, reveal simultaneously, discuss differences, and converge on a value.",
+    followups: ["what is realistic team velocity in agile"]
+  },
+  {
+    q: "what is three-point estimation or pert",
+    a: "It uses three values (optimistic, most likely, pessimistic) to estimate task durations, calculates expected values and standard deviations to account for uncertainty.",
+    followups: ["how to handle risk and uncertainty in estimates"]
+  },
+  {
+    q: "how do you define task dependencies and sequence tasks",
+    a: "Identify which tasks must precede others, find dependencies, then order tasks accordingly. This helps in building schedule (e.g. Gantt chart) and finding the critical path.",
+    followups: ["what is the critical path method", "how to forecast schedule with dependencies"]
+  },
+  {
+    q: "what is the critical path method",
+    a: "A scheduling technique where you identify the longest chain of dependent tasks; the critical path determines the shortest possible project duration. Any delay on tasks on this path delays whole project.",
+    followups: ["how to forecast schedule with dependencies"]
+  },
+  {
+    q: "how to handle risk and uncertainty in estimates",
+    a: "Include buffer or contingency, perform risk assessment, identify what could go wrong and include time for mitigation, use probabilistic estimation (ranges / PERT), continuously revisit estimates.",
+    followups: [
+      "how much buffer or contingency should be added",
+      "risk and uncertainty in estimation"
+    ]
+  },
+  {
+    q: "how to use historical data for estimation",
+    a: "Collect data from previous projects (actual vs estimated), use metrics like cost per LOC or per FP, see velocity or productivity, use that to calibrate estimation models / validate estimates.",
+    followups: ["how to use historical data for future estimates"]
+  },
+  {
+    q: "what is the cone of uncertainty",
+    a: "Early in a project you have high uncertainty (wide range in estimates), but uncertainty narrows as requirements are clarified and project progresses.",
+    followups: ["how accurate are early estimates"]
+  },
+  {
+    q: "what is proxy-based estimating",
+    a: "Estimation where tasks are compared to similar tasks done before (proxies), leveraging prior data of size, complexity to estimate new tasks.",
+    followups: ["how to use historical data for estimation"]
+  },
+  {
+    q: "how do you estimate non-development work",
+    a: "Include meetings, documentation, testing explicitly in the WBS, estimate each separately, and factor them into total schedule & cost.",
+    followups: ["how to factor quality assurance and testing"]
+  },
+  {
+    q: "what is a work breakdown structure",
+    a: "A hierarchical decomposition of project scope into smaller work items/tasks, which makes estimation easier and more accurate.",
+    followups: ["how to estimate non-development work"]
+  },
+  {
+    q: "how do you deal with scope creep",
+    a: "Define scope up front; include change control; re-estimate when scope changes; communicate impact of changes to stakeholders; include buffer.",
+    followups: ["how to present cost and duration estimates"]
+  },
+  {
+    q: "how accurate are early estimates",
+    a: "Early estimates are usually rough; accuracy improves as project progresses and more details become known. Often you may provide a range rather than a single number.",
+    followups: ["how much buffer or contingency should be added"]
+  },
+  {
+    q: "how to present cost and duration estimates",
+    a: "Provide assumptions, risks & dependencies, confidence levels, ranges, breakdown by major tasks/phases; be transparent about what is known vs unknown.",
+    followups: ["how to monitor and update estimates"]
+  },
+  {
+    q: "what are direct costs vs indirect costs",
+    a: "Direct: developer salaries, licenses, infrastructure. Indirect: overheads like management, office space, utilities, support.",
+    followups: ["what is cost estimation vs price estimation"]
+  },
+  {
+    q: "what is resource allocation role in estimation",
+    a: "The number/capability of people, their availability, and tools impact how long tasks take. Overloaded or inexperienced team slows down.",
+    followups: ["how many team members needed"]
+  },
+  {
+    q: "how does team experience affect estimates",
+    a: "Experienced teams estimate more reliably, reuse assets, understand trade-offs. Inexperienced teams need more buffer and face delays.",
+    followups: ["how much buffer or contingency should be added"]
+  },
+  {
+    q: "what tools can help with estimation",
+    a: "MS Project, JIRA, ClickUp, Trello; estimation plugins; spreadsheets; FP calculators; historical dashboards.",
+    followups: ["how to monitor and update estimates"]
+  },
+  {
+    q: "what is cost estimation vs price estimation",
+    a: "Cost estimation is internal: what it will cost to build. Price (quote) is what you charge the client, including margin/overheads/risk.",
+    followups: []
+  },
+  {
+    q: "how do you monitor and update estimates",
+    a: "Track actual vs planned, collect data, reforecast remaining work, adjust schedule/costs, manage changes.",
+    followups: ["continuous re estimation"]
+  },
+  {
+    q: "how much buffer or contingency should be added",
+    a: "Depends on risk and complexity; often 15–30% extra time or cost is added as buffer.",
+    followups: ["risk and uncertainty in estimation"]
+  },
+  {
+    q: "what is effort vs duration",
+    a: "Effort = total work (person-hours/days); Duration = calendar time considering resources, dependencies, weekends.",
+    followups: ["how many team members needed"]
+  },
+  {
+    q: "how do you estimate maintenance or support tasks",
+    a: "Estimate separately from new features; use ticket frequency & complexity; include monitoring, bug fixes, updates.",
+    followups: ["how to estimate external resources and tools"]
+  },
+  {
+    q: "what are units of measurement in estimation",
+    a: "Person-hours, person-days, person-months; Function Points; Use Case Points; LOC; Story Points.",
+    followups: ["effort vs duration"]
+  },
+  {
+    q: "when should estimation be done",
+    a: "At proposals (rough), during detailed planning (precise), refine as new info arises (design, pre-sprint).",
+    followups: ["continuous re estimation"]
+  },
+  {
+    q: "how to factor quality assurance and testing",
+    a: "Include all testing phases, bug fixing, performance/security testing as tasks; base on similar past projects.",
+    followups: ["how to estimate integration or external dependencies"]
+  },
+  {
+    q: "how to estimate integration or external dependencies",
+    a: "List external systems/components, effort for interfacing/testing, compatibility issues; allow delays for vendors.",
+    followups: ["how to estimate external resources and tools"]
+  },
+  {
+    q: "how to adjust estimates for parallel development",
+    a: "Account for communication overhead, integration issues, dependencies; parallel work reduces time but adds coordination cost.",
+    followups: ["what are pitfalls in estimation"]
+  },
+  {
+    q: "what is fixed price vs time and material estimation",
+    a: "Fixed-price: estimate all and lock cost/schedule; risk on vendor. T&M: pay for actual work; risk on client.",
+    followups: ["what are pitfalls in estimation"]
+  },
+  {
+    q: "what are pitfalls in estimation",
+    a: "Under-estimating unknowns, ignoring risk, leaving out non-coding work, overconfidence, underestimating comms.",
+    followups: ["what are the effects of wrong estimates"]
+  },
+  {
+    q: "how to use historical data for future estimates",
+    a: "Keep records of estimates vs actuals; analyze gaps; calibrate models; adjust productivity; keep task history.",
+    followups: ["how to use historical data for estimation"]
+  },
+  {
+    q: "what is the analysis effort method",
+    a: "Estimates duration/effort by evaluating size, familiarity, complexity, using tables from past data for each phase.",
+    followups: ["how to calculate effort"]
+  },
+  {
+    q: "how to estimate experimental parts",
+    a: "Prototype unknown parts, add buffer, break into smaller tasks, get expert opinion, assume worst case.",
+    followups: ["how much buffer or contingency should be added"]
+  },
+  {
+    q: "what is realistic team velocity in agile",
+    a: "Velocity = story points done per sprint. Improves over time; new teams start lower.",
+    followups: ["team velocity agile"]
+  },
+  {
+    q: "how to forecast schedule with dependencies",
+    a: "List dependencies, estimate, use three-point or ranges, build schedule, find critical path, stay flexible.",
+    followups: ["what is the critical path method"]
+  },
+  {
+    q: "what is continuous re estimation",
+    a: "Re-estimate as project info changes (scope, requirements, risks); agile calls it continuous refinement.",
+    followups: ["when should estimation be done"]
+  },
+  {
+    q: "how to estimate external resources and tools",
+    a: "Identify licences/infrastructure early, get quotes, include recurring costs, lead times; update cost doc.",
+    followups: []
+  },
+  {
+    q: "how long does a typical mid sized project take",
+    a: "Depends on scope, team size, complexity. Mid-sized web app often 3–6 months (varies widely).",
+    followups: ["how many team members needed"]
+  },
+  {
+    q: "what are the effects of wrong estimates",
+    a: "Under: overruns, missed deadlines, poor quality, burnout. Over: waste, high cost, delayed start.",
+    followups: []
+  },
+  {
+    q: "cocomo organic lines of code",
+    a: "Organic mode typically handles 2K–50K LOC, with small, experienced teams and stable requirements.",
+    followups: ["cocomo semi detached lines of code", "cocomo embedded lines of code"]
+  },
+  {
+    q: "cocomo semi detached lines of code",
+    a: "Semi-detached: 50K–300K LOC; moderate size teams, mixed experience.",
+    followups: ["cocomo embedded lines of code"]
+  },
+  {
+    q: "cocomo embedded lines of code",
+    a: "Embedded: >300K LOC, very complex, tight hardware/software coupling.",
+    followups: []
+  },
+  {
+    q: "how many team members needed",
+    a: "Team size depends on effort (person-months) divided by project duration; small projects 3–5 devs, medium 5–12, large 12+.",
+    followups: ["how to calculate effort", "effort vs duration"]
+  },
+  {
+    q: "which cocomo mode suits my project",
+    a: "Choose based on size/flexibility: small/simple → Organic; medium → Semi-detached; very large/hard-real-time → Embedded.",
+    followups: [
+      "cocomo organic lines of code",
+      "cocomo semi detached lines of code",
+      "cocomo embedded lines of code"
+    ]
+  },
+  {
+    q: "how to fix functional points",
+    a: "Identify external inputs/outputs, files, interfaces, inquiries → assign weights → sum & adjust by complexity to get FP.",
+    followups: ["how to map FP to effort"]
+  },
+  {
+    q: "how to calculate effort",
+    a: "Effort ≈ a × (KLOC)^b (COCOMO) or FP × productivity.",
+    followups: ["how many team members needed"]
+  },
+  {
+    q: "team velocity agile",
+    a: "Velocity = avg story points per sprint; improves as team stabilizes.",
+    followups: []
+  },
+  {
+    q: "work breakdown structure",
+    a: "A WBS decomposes the project into deliverables, aiding accurate estimates.",
+    followups: ["how to estimate non-development work"]
+  },
+  {
+    q: "risk and uncertainty in estimation",
+    a: "Add buffers, use 3-point estimates, Monte Carlo, update as you learn.",
+    followups: ["how much buffer or contingency should be added"]
+  }
+];
+
+const chatBox = document.getElementById("chat-box");
+const userInput = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
+const backgroundElementsContainer = document.querySelector(".background-elements");
+const startBtn = document.getElementById("startBtn");
+// ADDED: New button references
+const codeGeneratorBtn = document.getElementById("codeGeneratorBtn");
+const projectEstimationBtn = document.getElementById("projectEstimationBtn");
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = "en-US";
+recognition.interimResults = false;
+
+startBtn.addEventListener("click", () => {
+  recognition.start();
+});
+
+recognition.onresult = (event) => {
+  const transcript = event.results[0][0].transcript;
+  userInput.value = transcript;
+  handleSend(transcript);
+};
+
+recognition.onerror = (event) => {
+  appendMessage("Error: " + event.error, "bot");
+};
+
+function appendMessage(text, sender) {
+  const div = document.createElement("div");
+  div.className = `message ${sender}`;
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function appendFollowups(list) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "followups";
+  list.forEach(q => {
+    const btn = document.createElement("button");
+    btn.textContent = q;
+    btn.addEventListener("click", () => handleSend(q));
+    wrapper.appendChild(btn);
+  });
+  chatBox.appendChild(wrapper);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function findAnswer(userText) {
+  const text = userText.toLowerCase();
+  
+  // ADDED: Check for custom responses first
+  for (const [key, response] of Object.entries(customResponses)) {
+    if (text.includes(key)) {
+      return { a: response, followups: [] };
+    }
+  }
+  
+  let best = null, score = 0;
+  dataset.forEach(item => {
+    let matches = 0;
+    item.q.split(/\W+/).forEach(word => {
+      if (text.includes(word)) matches++;
+    });
+    if (matches > score) { score = matches; best = item; }
+  });
+  return best && score > 0 ? best : null;
+}
+
+function handleSend(optionalText) {
+  const txt = optionalText || userInput.value.trim();
+  if (!txt) return;
+  appendMessage(txt, "user");
+  userInput.value = "";
+
+  setTimeout(() => {
+    const result = findAnswer(txt);
+    if (result) {
+      appendMessage(result.a, "bot");
+      if (result.followups) appendFollowups(result.followups);
+    } else {
+      appendMessage(
+        "I couldn't find an exact match. Try asking about cost, duration, team size, COCOMO modes, or functional points.",
+        "bot"
+      );
+    }
+  }, 300);
+}
+
+function createBackgroundElement() {
+    const element = document.createElement('div');
+    element.classList.add('element');
+    
+    const type = Math.random();
+    if (type < 0.4) {
+        const size = Math.random() * 20 + 10;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+    } else if (type < 0.7) {
+        element.classList.add('chart');
+        const width = Math.random() * 15 + 5;
+        const height = Math.random() * 40 + 20;
+        element.style.width = `${width}px`;
+        element.style.height = `${height}px`;
+    } else {
+        element.classList.add('line');
+        const width = Math.random() * 60 + 30;
+        element.style.width = `${width}px`;
+        element.style.height = `2px`;
+        element.style.borderRadius = `1px`;
+    }
+
+    element.style.left = `${Math.random() * 100}vw`;
+    element.style.animationDuration = `${Math.random() * 10 + 10}s`;
+    element.style.animationDelay = `${Math.random() * 5}s`;
+    element.style.setProperty('--x-drift', `${(Math.random() - 0.5) * 200}px`);
+    element.style.setProperty('--rotation', `${Math.random() * 720 - 360}deg`);
+    element.style.setProperty('--scale', `${Math.random() * 0.5 + 0.7}`);
+    
+    backgroundElementsContainer.appendChild(element);
+
+    element.addEventListener('animationend', () => {
+        element.remove();
+    });
+}
+
+setInterval(createBackgroundElement, 500);
+
+sendBtn.addEventListener("click", () => handleSend());
+userInput.addEventListener("keypress", e => { if (e.key === "Enter") handleSend(); });
+
+// ADDED: Event listeners for new buttons
+codeGeneratorBtn.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+projectEstimationBtn.addEventListener("click", () => {
+  window.location.href = "estimation.html";
+});
+
+</script>
+</body>
+</html>

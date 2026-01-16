@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhanced Dynamic Code Generator</title>
+<style>
+  /* Enhanced Animated Gradient Background */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(-45deg, #ff6b6b, #ffa36c, #6b5b95, #88d3ce, #4ecdc4);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Floating particles background */
+  .particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+  }
+  
+  .particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: float 15s infinite linear;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); }
+    100% { transform: translateY(-1000px) translateX(500px) rotate(720deg); }
+  }
+  
+  @keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  /* Header Styling with animation */
+  h1 {
+    text-align: center;
+    margin-top: 30px;
+    color: #fff;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    position: relative;
+    animation: fadeInDown 1s ease;
+  }
+  
+  h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    border-radius: 2px;
+  }
+  
+  @keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Input Section with enhanced styling */
+  .input-section {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 30px 20px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    position: relative;
+    overflow: hidden;
+    animation: slideInUp 0.8s ease;
+  }
+  
+  .input-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .input-section:hover::before {
+    left: 100%;
+  }
+  
+  @keyframes slideInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  input {
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    width: 320px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    background: white;
+  }
+
+  input::placeholder {
+    color: #888;
+  }
+
+  button {
+    padding: 14px 28px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    transition: all 0.4s ease;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  button:disabled {
+    background: linear-gradient(135deg, #555, #333);
+    cursor: not-allowed;
+  }
+  
+  button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+    z-index: -1;
+  }
+  
+  button:hover::before {
+    left: 100%;
+  }
+
+  button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Additional button styles for new buttons */
+  .ai-assistant-btn {
+    background: linear-gradient(135deg, #6f42c1, #5a2d91);
+  }
+  
+  .estimation-btn {
+    background: linear-gradient(135deg, #20c997, #17a673);
+  }
+
+  /* --- MODIFIED: 2x2 grid to include preview --- */
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 25px;
+    flex: 1;
+    animation: fadeIn 1s ease 0.3s both;
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .code-panel {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .code-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    pointer-events: none;
+  }
+
+  .code-panel:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .code-panel h3 {
+    margin: 0;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #343a40, #495057);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .code-panel h3::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #28a745;
+    box-shadow: 0 0 10px #28a745;
+  }
+
+  textarea {
+    width: 100%;
+    height: 320px;
+    padding: 18px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    border: none;
+    resize: vertical;
+    background: #f8f9fa;
+    font-size: 14px;
+    line-height: 1.6;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-left: 4px solid #007bff;
+    background: #fff;
+  }
+  
+  textarea::-webkit-scrollbar { width: 8px; }
+  textarea::-webkit-scrollbar-track { background: #f1f1f1; }
+  textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+  textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+  
+  /* --- ADDED: Preview Frame styles --- */
+  #previewFrame {
+    width: 100%;
+    /* Height ~ 320px (textarea) + 48px (copy button) */
+    height: 368px; 
+    border: none;
+    background: #fff;
+    box-sizing: border-box;
+  }
+
+  .copyBtn {
+    margin: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #28a745, #218838);
+    border-radius: 0;
+    padding: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .copyBtn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .copyBtn:active::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 25px;
+    color: #fff;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(5px);
+    position: relative;
+  }
+  
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    background: #28a745;
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.4s ease;
+    z-index: 1000;
+  }
+  
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* -------------------------------------------------------------------------
+     NOTE: The rest of the original file contained repeated/garbled blocks,
+     stray tokens like "TML", duplicated CSS, and other fragments that caused
+     parse errors. To preserve every original line without deleting them, the
+     duplicated/corrupted fragments below are wrapped in a comment so they do
+     not break the document. If you want to restore any specific block, remove
+     the comment markers around that block.
+     ------------------------------------------------------------------------- */
+
+</style>
+
+<!-- START: corrupted/duplicate/garbled block from original file (kept but commented out) -->
+<!--
+  TML
+      <textarea id="htmlCode" readonly></textarea>
+      <button class="copyBtn" data-target="htmlCode">Copy HTML</button>
+    </div>
+    <div class="code-panel">
+      <h3>CSS</h3>
+      <textarea id="cssCode" readonly></textarea>
+      <button class="copyBtn" data-target="cssCode">Copy CSS</button>
+    </div>
+    <div class="code-panel">
+      <h3>JavaScript</h3>
+      <textarea id="jsCode" readonly></textarea>
+      <button class="copyBtn" data-target="jsCode">Copy JS</button>
+    </div>
+        <div class="code-panel">
+      <h3>Preview</h3>
+      <iframe id="previewFrame"></iframe>
+    </div>
+  </div>
+-->
+<!-- END: corrupted block -->
+
+</head>
+<body>
+  <!-- Add the particles container (script expects #particles) -->
+  <div id="particles" class="particles"></div>
+
+  <h1>Enhanced Dynamic Code Generator</h1>
+
+  <!-- Input section: ensure referenced controls exist for the JS code -->
+  <div class="input-section">
+    <!-- topic input and generate button referenced in script -->
+    <input id="topicInput" placeholder="Enter topic (e.g. landing page for a coffee shop)" />
+    <button id="generateBtn">Generate Code</button>
+
+    <!-- ADDED: New buttons referenced by script -->
+    <button id="aiAssistantBtn" class="ai-assistant-btn">AI Assistant</button>
+    <button id="estimationBtn" class="estimation-btn">Project Estimation</button>
+  </div>
+
+  <div class="container">
+    <div class="code-panel">
+      <h3>HTML</h3>
+      <textarea id="htmlCode" readonly></textarea>
+      <button class="copyBtn" data-target="htmlCode">Copy HTML</button>
+    </div>
+    <div class="code-panel">
+      <h3>CSS</h3>
+      <textarea id="cssCode" readonly></textarea>
+      <button class="copyBtn" data-target="cssCode">Copy CSS</button>
+    </div>
+    <div class="code-panel">
+      <h3>JavaScript</h3>
+      <textarea id="jsCode" readonly></textarea>
+      <button class="copyBtn" data-target="jsCode">Copy JS</button>
+    </div>
+    <div class="code-panel">
+      <h3>Preview</h3>
+      <iframe id="previewFrame"></iframe>
+    </div>
+  </div>
+
+  <footer>© 2025 Dynamic Code Generator | All Rights Reserved</footer>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+// --- START OF SCRIPT ---
+const topicInput = document.getElementById('topicInput');
+const generateBtn = document.getElementById('generateBtn');
+const htmlCode = document.getElementById('htmlCode');
+const cssCode = document.getElementById('cssCode');
+const jsCode = document.getElementById('jsCode');
+const copyButtons = document.querySelectorAll('.copyBtn');
+const particlesContainer = document.getElementById('particles');
+const toast = document.getElementById('toast');
+// ADDED: New button references
+const aiAssistantBtn = document.getElementById('aiAssistantBtn');
+const estimationBtn = document.getElementById('estimationBtn');
+// ADDED: Preview element
+const previewFrame = document.getElementById('previewFrame');
+
+// Create floating particles
+function createParticles() {
+  const particleCount = 20;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 10 + 5;
+    const left = Math.random() * 100;
+    const animationDuration = Math.random() * 20 + 10;
+    const animationDelay = Math.random() * 5;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.left = `${left}%`;
+    particle.style.animationDuration = `${animationDuration}s`;
+    particle.style.animationDelay = `${animationDelay}s`;
+    particlesContainer.appendChild(particle);
+  }
+}
+
+// Toast Notification
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// --- MODIFIED: Generate Code from our *OWN* Server ---
+async function generateCodeFromAPI(topic) {
+  try {
+    // This now calls our *local* server, which is safe
+    const response = await fetch('/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ topic: topic })
+    });
+
+    if (!response.ok) {
+      // Get error message from backend
+      const err = await response.json();
+      throw new Error(err.error || `Server error: ${response.status}`);
+    }
+    
+    // The server gives us clean JSON
+    const code = await response.json();
+    return code;
+
+  } catch (error) {
+    console.error('Error generating code:', error);
+    showToast(`Error: ${error.message}. Is the server running?`);
+    return null;
+  }
+}
+
+// Copy button functionality
+copyButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.getAttribute('data-target');
+    const textarea = document.getElementById(targetId);
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(textarea.value).then(() => {
+             showToast(`${targetId.toUpperCase()} Copied!`);
+        }).catch(err => {
+            showToast('Failed to copy!');
+        });
+    } else {
+        // Fallback
+        try {
+            textarea.select();
+            document.execCommand('copy');
+            showToast(`${targetId.toUpperCase()} Copied!`);
+        } catch (err) {
+            showToast('Failed to copy!');
+        }
+    }
+  });
+});
+
+// --- ADDED: Refresh preview function ---
+function refreshPreview() {
+  const html = htmlCode.value;
+  const css = cssCode.value;
+  const js = jsCode.value;
+  
+  const srcDoc = `
+    <html>
+      <head>
+        <style>${css}</style>
+      </head>
+      <body>
+        ${html}
+        <script>${js}<\/script>
+      </body>
+    </html>
+  `;
+  
+  previewFrame.srcdoc = srcDoc;
+}
+
+// Generate Button (async)
+generateBtn.addEventListener('click', async () => {
+  const topic = topicInput.value.trim();
+  if (!topic) {
+    showToast('Please enter a topic!');
+    return;
+  }
+  
+  generateBtn.textContent = 'Generating...';
+  generateBtn.disabled = true;
+  htmlCode.value = "Connecting to AI... Generating HTML...";
+  cssCode.value = "Connecting to AI... Generating CSS...";
+  jsCode.value = "Connecting to AI... Generating JavaScript...";
+
+  const code = await generateCodeFromAPI(topic);
+
+  if (code) {
+    htmlCode.value = code.html;
+    cssCode.value = code.css;
+    jsCode.value = code.js;
+    showToast('Template Generated Successfully!');
+    // ADDED: Refresh the preview
+    refreshPreview();
+  } else {
+    // Clear textareas if API call failed
+    htmlCode.value = "Generation failed. Check console for errors.";
+    cssCode.value = "";
+    jsCode.value = "";
+  }
+  
+  generateBtn.textContent = 'Generate Code';
+  generateBtn.disabled = false;
+});
+
+// ADDED: Event listeners for new buttons
+aiAssistantBtn.addEventListener('click', () => {
+  window.location.href = 'ai.html';
+});
+
+estimationBtn.addEventListener('click', () => {
+  window.location.href = 'estimation.html';
+});
+
+// Initialize
+createParticles();
+// --- END OF SCRIPT ---
+</script>
+</body>
+</html>

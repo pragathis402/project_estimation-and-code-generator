@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EstimateAI - Project Estimation</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+</script>
+<style>
+/* ====== ENHANCED THEME VARIABLES ====== */
+:root {
+    --primary-color: #0077cc;
+    --secondary-color: #005fa3;
+    --background-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-color: #333;
+    --text-color-light: #666;
+    --border-color: #e0e0e0;
+    --border-radius: 10px;
+    --box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+}
+
+.dark-theme {
+    --primary-color: #4a90e2;
+    --secondary-color: #3a7bc8;
+    --background-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #f0f0f0;
+    --text-color-light: #aaa;
+    --border-color: #333;
+    --box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+}
+
+.ocean-theme {
+    --primary-color: #1e88e5;
+    --secondary-color: #1565c0;
+    --background-color: #e3f2fd;
+    --card-bg: #ffffff;
+    --text-color: #0d47a1;
+    --text-color-light: #0277bd;
+    --border-color: #b3e5fc;
+    --box-shadow: 0px 4px 15px rgba(0,119,204,0.1);
+}
+
+.sunset-theme {
+    --primary-color: #ff7043;
+    --secondary-color: #e64a19;
+    --background-color: #fff3e0;
+    --card-bg: #ffffff;
+    --text-color: #bf360c;
+    --text-color-light: #e64a19;
+    --border-color: #ffe0b2;
+    --box-shadow: 0px 4px 15px rgba(255,112,67,0.1);
+}
+
+/* ====== BASE & LAYOUT ====== */
+* { 
+    box-sizing: border-box;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; 
+}
+
+body { 
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin:0; 
+    padding:0; 
+    background-color: var(--background-color); 
+    color: var(--text-color); 
+    line-height: 1.6;
+}
+
+main { 
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+section { 
+    margin-bottom: 30px; 
+    background-color: var(--card-bg);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+}
+
+h1, h2, h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+}
+h2 {
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* ====== HEADER ====== */
+header { 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    padding: 15px 30px; 
+    background-color: var(--card-bg); 
+    color: var(--primary-color); 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--border-color);
+    gap:15px; 
+    flex-wrap:wrap; 
+}
+
+header h1 { 
+    margin:0; 
+    font-size: 1.5rem; 
+    flex: 1; 
+    min-width: 200px;
+}
+
+.theme-selector { 
+    display:flex; 
+    align-items:center; 
+    gap: 8px; 
+}
+.theme-selector label {
+    font-weight: 500;
+}
+.theme-selector select, #aiAssistant, #codeGenerator {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.theme-selector select:focus, #aiAssistant:focus, #codeGenerator:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+#aiAssistant, #codeGenerator {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+#aiAssistant:hover, #codeGenerator:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ====== UPLOAD & MANUAL SECTION ====== */
+.upload-box { 
+    padding: 30px; 
+    border: 2px dashed var(--primary-color); 
+    border-radius: 10px; 
+    text-align:center; 
+    cursor:pointer; 
+    margin-bottom: 15px; 
+    background-color: rgba(0,119,204,0.05);
+}
+.upload-box:hover { background-color: rgba(0,119,204,0.1); }
+.file-item { 
+    margin: 5px 0; 
+    padding: 8px;
+    background-color: var(--background-color);
+    border-radius: 5px;
+}
+.file-size { color: var(--text-color-light); font-size: 0.9em; }
+
+button { 
+    padding: 12px 25px; 
+    border:none; 
+    border-radius: 5px; 
+    cursor:pointer; 
+    background-color: var(--primary-color); 
+    color:#fff; 
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+button:hover:not(:disabled) {
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+button:disabled { background-color:#ccc; cursor:not-allowed; }
+
+.loading { 
+    border: 3px solid rgba(255,255,255,0.3); 
+    border-top: 3px solid #fff; 
+    border-radius:50%; 
+    width:16px; 
+    height:16px; 
+    animation:spin 1s linear infinite; 
+    display:inline-block; 
+    vertical-align:middle; 
+    margin-right: 8px; 
+}
+@keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+/* NEW: Manual Input */
+#manualForm {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+#manualForm label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+#manualForm input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+#manualToggle {
+    margin-left: 10px;
+}
+
+/* ====== RESULTS SECTION (INSIGHTS, SUMMARY, CHARTS) ====== */
+.ai-insights { 
+    display:none; 
+}
+.ai-insights ul {
+    list-style-type: '💡';
+    padding-left: 25px;
+}
+.ai-insights li {
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+.summary-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap:20px; 
+    margin-top: 20px; 
+}
+.summary-item { 
+    background-color: var(--background-color); 
+    padding: 20px; 
+    border-radius: 8px; 
+    text-align:center; 
+    border: 1px solid var(--border-color);
+}
+.summary-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color-light);
+}
+.summary-value { 
+    font-size: 1.8rem; 
+    font-weight:bold; 
+    color: var(--primary-color);
+    margin-top: 5px;
+}
+
+.charts-container { 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:20px; 
+    margin-top: 30px;
+}
+.chart-container { 
+    min-width: 300px; 
+    height: 350px; 
+    padding: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:1024px) {
+    .charts-container { grid-template-columns: 1fr; }
+}
+@media(max-width:768px){ 
+    header { flex-direction: column; align-items: stretch; }
+    .theme-selector { justify-content: space-between; }
+    #aiAssistant, #codeGenerator { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>EstimateAI</h1>
+    <div class="theme-selector">
+        <label for="themeSelect">Theme:</label>
+        <select id="themeSelect">
+            <option value="default">Default</option>
+            <option value="dark">Dark</option>
+            <option value="ocean">Ocean</option>
+            <option value="sunset">Sunset</option>
+        </select>
+    </div>
+    <button id="aiAssistant">🤖 AI Assistant</button>
+    <button id="codeGenerator">💻 Code Generator</button>
+</header>
+
+<main>
+
+<section class="upload-section">
+    <h2>Project Analysis</h2>
+    
+    <div id="pdfUploadContainer">
+        <div class="upload-box" id="uploadBox">
+            <p>Drag & Drop PDF files here or click to upload</p>
+            <input type="file" id="fileInput" multiple style="display:none;" accept="application/pdf">
+        </div>
+        <div id="fileList"></div>
+        <button id="analyzeBtn" disabled><span class="button-text">Analyze PDF</span></button>
+    </div>
+    
+    <div id="uploadMessage"></div>
+
+    <div>
+        <input type="checkbox" id="manualToggle">
+        <label for="manualToggle">Use Manual Input Instead</label>
+    </div>
+
+    <form id="manualForm">
+        <div>
+            <label for="manualDuration">Estimated Duration (days)</label>
+            <input type="number" id="manualDuration" placeholder="e.g., 90">
+        </div>
+        <div>
+            <label for="manualTeam">Team Size</label>
+            <input type="number" id="manualTeam" placeholder="e.g., 5">
+        </div>
+        <div>
+            <label for="manualCost">Estimated Cost ($)</label>
+            <input type="number" id="manualCost" placeholder="e.g., 100000">
+        </div>
+        <button type="button" id="manualAnalyzeBtn">Analyze Manually</button>
+    </form>
+</section>
+
+<section class="ai-insights" id="aiInsights">
+    <h2>AI Insights</h2>
+    <ul id="insightList"></ul>
+
+    <div class="analysis-summary">
+        <h3>Project Summary</h3>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-label">Estimated Duration</div>
+                <div class="summary-value" id="durationValue">0 days</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Team Size</div>
+                <div class="summary-value" id="teamSizeValue">0 members</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Total Cost</div>
+                <div class="summary-value" id="costValue">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Project Complexity</div>
+                <div class="summary-value" id="complexityValue">Low</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-container">
+            <div class="chart-title">Project Timeline (Days)</div>
+            <canvas id="timelineChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Team Composition</div>
+            <canvas id="teamChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Cost Breakdown (%)</div>
+            <canvas id="costChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Cost vs. Timeline</div>
+            <canvas id="profitChart"></canvas>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<script>
+// ===== APP STATE =====
+// Store chart instances to update them instead of re-creating
+let timelineChart, teamChart, costChart, profitChart;
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // ===== THEME HANDLER =====
+    const themeSelect=document.getElementById('themeSelect');
+    function applyTheme(theme){
+        document.body.className = theme === 'default' ? '' : theme + '-theme';
+        localStorage.setItem('estimateAI-theme', theme);
+        // NEW: Update chart colors
+        updateChartColors();
+    }
+    const savedTheme=localStorage.getItem('estimateAI-theme') || 'default';
+    themeSelect.value=savedTheme;
+    applyTheme(savedTheme);
+    themeSelect.addEventListener('change', e => applyTheme(e.target.value));
+
+    // ===== UI ELEMENTS =====
+    const fileInput = document.getElementById('fileInput');
+    const uploadBox = document.getElementById('uploadBox');
+    const fileList = document.getElementById('fileList');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const uploadMessage = document.getElementById('uploadMessage');
+    const insightList = document.getElementById('insightList');
+    const aiInsightsSection = document.getElementById('aiInsights');
+
+    // NEW: Manual Input Elements
+    const manualToggle = document.getElementById('manualToggle');
+    const manualForm = document.getElementById('manualForm');
+    const pdfUploadContainer = document.getElementById('pdfUploadContainer');
+    const manualAnalyzeBtn = document.getElementById('manualAnalyzeBtn');
+
+    // ===== FILE UPLOAD =====
+    uploadBox.addEventListener('click',()=>fileInput.click());
+    fileInput.addEventListener('change',handleFiles);
+    uploadBox.addEventListener('dragover',e=>{e.preventDefault(); uploadBox.style.backgroundColor='rgba(0,119,204,0.15)';});
+    uploadBox.addEventListener('dragleave',()=>{uploadBox.style.backgroundColor='rgba(0,119,204,0.05)';});
+    uploadBox.addEventListener('drop',e=>{e.preventDefault(); uploadBox.style.backgroundColor='rgba(0,119,204,0.05)'; fileInput.files=e.dataTransfer.files; handleFiles();});
+
+    function handleFiles(){
+        const files=Array.from(fileInput.files);
+        fileList.innerHTML=''; 
+        insightList.innerHTML=''; 
+        analyzeBtn.disabled=true;
+        if(files.length===0){ uploadMessage.textContent=''; return; }
+        
+        files.forEach(file=>{
+            const div=document.createElement('div');
+            div.className='file-item';
+            div.innerHTML=`<span>📂</span> <span>${file.name}</span> <span class="file-size">(${Math.round(file.size/1024)} KB)</span>`;
+            fileList.appendChild(div);
+        });
+        
+        uploadMessage.innerHTML=`<span style="color:var(--success-color);">✅ ${files.length} file(s) ready for analysis!</span>`;
+        analyzeBtn.disabled=false;
+    }
+
+    // ===== NEW: MANUAL INPUT TOGGLE =====
+    manualToggle.addEventListener('change', () => {
+        if (manualToggle.checked) {
+            manualForm.style.display = 'grid';
+            pdfUploadContainer.style.display = 'none';
+            aiInsightsSection.style.display = 'none';
+            uploadMessage.innerHTML = '';
+            fileList.innerHTML = '';
+            fileInput.value = '';
+            analyzeBtn.disabled = true;
+        } else {
+            manualForm.style.display = 'none';
+            pdfUploadContainer.style.display = 'block';
+        }
+    });
+
+    // ===== ANALYSIS =====
+    
+    // 1. PDF Analysis Button
+    analyzeBtn.addEventListener('click', async () => {
+        analyzeBtn.innerHTML='<span class="loading"></span>Analyzing...';
+        analyzeBtn.disabled=true;
+        uploadMessage.innerHTML = 'Reading PDF...';
+        
+        try {
+            const files = Array.from(fileInput.files);
+            let fullText = '';
+            
+            for(let file of files){
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                for(let i=1; i<=pdf.numPages; i++){
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    fullText += content.items.map(item => item.str).join(' ');
+                }
+            }
+            
+            uploadMessage.innerHTML = '<span style="color:var(--success-color);">✅ PDF Analyzed! Generating report...</span>';
+            const analysisData = analyzeText(fullText); // Run "AI" analysis
+            updateUI(analysisData); // Update all UI components
+
+        } catch (error) {
+            console.error("PDF Parsing Error:", error);
+            uploadMessage.innerHTML = `<span style="color:var(--danger-color);">❌ Error reading PDF. File might be corrupt or encrypted.</span>`;
+        }
+        
+        analyzeBtn.innerHTML='<span class="button-text">Analyze PDF</span>';
+        analyzeBtn.disabled=false;
+    });
+
+    // 2. Manual Analysis Button
+    manualAnalyzeBtn.addEventListener('click', () => {
+        const duration = parseInt(document.getElementById('manualDuration').value) || 90;
+        const teamSize = parseInt(document.getElementById('manualTeam').value) || 5;
+        const cost = parseInt(document.getElementById('manualCost').value) || 100000;
+        
+        const analysisData = {
+            duration: duration,
+            teamSize: teamSize,
+            cost: cost,
+            complexity: 1.2, // Assign a base complexity
+            insights: [
+                "Analysis based on manual input.",
+                `Duration set to ${duration} days.`,
+                `Team size set to ${teamSize} members.`
+            ]
+        };
+        
+        updateUI(analysisData);
+    });
+
+    // ===== NEW: "AI" TEXT ANALYSIS (SMARTER LOGIC) =====
+    function analyzeText(text) {
+        const lowerText = text.toLowerCase();
+        let duration = 30; // Base duration
+        let teamSize = 2; // Base team
+        let cost = 50000; // Base cost
+        let complexity = 1.0;
+        let insights = [];
+
+        // Role analysis
+        teamSize += (lowerText.match(/developer|engineer/gi) || []).length * 0.5;
+        teamSize += (lowerText.match(/project manager|pm/gi) || []).length * 0.2;
+        teamSize += (lowerText.match(/designer|ux|ui/gi) || []).length * 0.3;
+        teamSize += (lowerText.match(/qa|test/gi) || []).length * 0.3;
+
+        // Feature/Complexity analysis
+        if (lowerText.includes('database') || lowerText.includes('sql')) { duration += 10; complexity += 0.2; insights.push("Database work detected, adding 10 days."); }
+        if (lowerText.includes('api') || lowerText.includes('integration')) { duration += 15; complexity += 0.3; insights.push("API integration detected, adding 15 days."); }
+        if (lowerText.includes('payment') || lowerText.includes('stripe')) { duration += 20; complexity += 0.4; insights.push("Payment gateway required, adding 20 days and increasing complexity."); }
+        if (lowerText.includes('auth') || lowerText.includes('login')) { duration += 7; complexity += 0.1; insights.push("Authentication system detected, adding 7 days."); }
+        if (lowerText.includes('e-commerce') || lowerText.includes('shop')) { duration += 40; complexity += 0.5; insights.push("E-commerce functionality is complex, adding 40 days."); }
+
+        // Check for explicit numbers
+        let durationMatch = lowerText.match(/(\d+)\s*(days|weeks|months)/);
+        if (durationMatch) {
+            let num = parseInt(durationMatch[1]);
+            let unit = durationMatch[2];
+            if (unit === 'weeks') duration = num * 7;
+            else if (unit === 'months') duration = num * 30;
+            else duration = num;
+            insights.push(`Found explicit timeline: ${num} ${unit}.`);
+        }
+        
+        let costMatch = lowerText.match(/\$(\d{1,3},?(\d{3},?)*\d{3}|\d+)/);
+        if (costMatch) {
+            cost = parseInt(costMatch[0].replace(/[$,]/g, ''));
+            insights.push(`Found explicit cost: $${cost.toLocaleString()}.`);
+        }
+
+        // Final calculations
+        teamSize = Math.max(1, Math.ceil(teamSize)); // At least 1 person
+        cost = Math.max(cost, duration * 8 * 80 * teamSize * 0.5); // Min cost based on duration/team (8hrs/day, $80/hr avg, 50% utilization)
+        duration = Math.ceil(duration * complexity); // Adjust duration by complexity
+        
+        if (complexity > 1.8) insights.push("High project complexity detected. Recommend adding a 15% time buffer.");
+        if (teamSize < 3 && duration > 60) insights.push("Risk: Team size seems small for a project of this duration.");
+
+        return { duration, teamSize, cost, complexity, insights };
+    }
+
+    // ===== NEW: CENTRAL UI UPDATE FUNCTION =====
+    function updateUI(data) {
+        const { duration, teamSize, cost, complexity, insights } = data;
+
+        // Update summary
+        document.getElementById('durationValue').textContent = duration + ' days';
+        document.getElementById('teamSizeValue').textContent = teamSize + ' members';
+        document.getElementById('costValue').textContent = '$' + cost.toLocaleString();
+        
+        let complexityLabel = "Low";
+        if (complexity > 1.8) complexityLabel = "High";
+        else if (complexity > 1.3) complexityLabel = "Medium";
+        document.getElementById('complexityValue').textContent = complexityLabel;
+
+        // Update insights
+        insightList.innerHTML = insights.map(item => `<li>${item}</li>`).join('');
+
+        // Update charts with new data
+        updateCharts(duration, teamSize, cost);
+        
+        // Show the results
+        aiInsightsSection.style.display = 'block';
+        aiInsightsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ===== NEW: CHART FUNCTIONS (INIT & UPDATE) =====
+    
+    // Get computed text color for themes
+    function getChartTextColor() {
+        return getComputedStyle(document.body).getPropertyValue('--text-color').trim();
+    }
+    
+    function updateChartColors() {
+        const textColor = getChartTextColor();
+        const gridColor = getComputedStyle(document.body).getPropertyValue('--border-color').trim();
+
+        [timelineChart, teamChart, costChart, profitChart].forEach(chart => {
+            if (chart) {
+                // Update legend and title
+                chart.options.plugins.legend.labels.color = textColor;
+                chart.options.plugins.title.color = textColor;
+                
+                // Update scales (axes)
+                if (chart.options.scales.x) {
+                    chart.options.scales.x.ticks.color = textColor;
+                    chart.options.scales.x.grid.color = gridColor;
+                    chart.options.scales.x.title.color = textColor;
+                }
+                if (chart.options.scales.y) {
+                    chart.options.scales.y.ticks.color = textColor;
+                    chart.options.scales.y.grid.color = gridColor;
+                    chart.options.scales.y.title.color = textColor;
+                }
+                chart.update();
+            }
+        });
+    }
+
+    // 1. Initialize all charts (called once)
+    function initCharts() {
+        const textColor = getChartTextColor();
+        const gridColor = getComputedStyle(document.body).getPropertyValue('--border-color').trim();
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: textColor } }
+            }
+        };
+
+        const scaleOptions = {
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    title: { display: true, text: 'Days', color: textColor },
+                    ticks: { color: textColor },
+                    grid: { color: gridColor }
+                },
+                x: {
+                    ticks: { color: textColor },
+                    grid: { color: gridColor }
+                }
+            }
+        };
+
+        // Timeline Chart
+        const timelineCtx=document.getElementById('timelineChart').getContext('2d');
+        timelineChart = new Chart(timelineCtx,{ type:'bar',
+            data:{ labels:['Planning','Design','Development','Testing','Deployment'], datasets:[{ label:'Days', data:[], backgroundColor:['rgba(54,162,235,0.7)','rgba(75,192,192,0.7)','rgba(255,159,64,0.7)','rgba(255,99,132,0.7)','rgba(153,102,255,0.7)'] }]},
+            options: { ...commonOptions, ...scaleOptions }
+        });
+
+        // Team Chart
+        const teamCtx=document.getElementById('teamChart').getContext('2d');
+        teamChart = new Chart(teamCtx,{ type:'doughnut',
+            data:{ labels:['Developers','Designers','QA', 'PMs'], datasets:[{ data:[], backgroundColor:['rgba(255,99,132,0.7)','rgba(54,162,235,0.7)','rgba(255,206,86,0.7)','rgba(75,192,192,0.7)'] }]},
+            options: { ...commonOptions }
+        });
+
+        // Cost Chart
+        const costCtx=document.getElementById('costChart').getContext('2d');
+        costChart = new Chart(costCtx,{ type:'pie',
+            data:{ labels:['Development','Design','Testing','Management','Infrastructure'], datasets:[{ data:[], backgroundColor:['rgba(255,99,132,0.7)','rgba(54,162,235,0.7)','rgba(255,206,86,0.7)','rgba(75,192,192,0.7)','rgba(153,102,255,0.7)'] }]},
+            options: { ...commonOptions }
+        });
+
+        // Profit (Cost vs Time) Chart
+        const profitCtx=document.getElementById('profitChart').getContext('2d');
+        profitChart = new Chart(profitCtx,{ type:'line',
+            data:{ labels:['Start', '25%', '50%', '75%', 'Finish'], datasets:[
+                { label:'Cumulative Cost', data:[], borderColor:'rgb(255,99,132)', backgroundColor:'rgba(255,99,132,0.1)', tension:0.3, fill:true }
+            ]},
+            options:{ ...commonOptions, scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Cost ($)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } },
+                x: { title: { display: true, text: 'Project Timeline', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }
+            } }
+        });
+    }
+
+    // 2. Update chart data (called on analysis)
+    function updateCharts(duration, teamSize, cost){
+        if (!timelineChart) initCharts(); // Initialize charts if they don't exist
+        
+        // Update Timeline
+        timelineChart.data.datasets[0].data = [
+            Math.floor(duration * 0.15), // Planning
+            Math.floor(duration * 0.20), // Design
+            Math.floor(duration * 0.40), // Development
+            Math.floor(duration * 0.20), // Testing
+            Math.floor(duration * 0.05)  // Deployment
+        ];
+        
+        // Update Team
+        let devs = Math.max(1, Math.floor(teamSize * 0.5));
+        let design = Math.max(1, Math.floor(teamSize * 0.2));
+        let qa = Math.max(1, Math.floor(teamSize * 0.2));
+        let pm = Math.max(1, teamSize - devs - design - qa);
+        teamChart.data.datasets[0].data = [devs, design, qa, pm];
+
+        // Update Cost
+        costChart.data.datasets[0].data = [
+            Math.floor(cost * 0.50), // Development
+            Math.floor(cost * 0.15), // Design
+            Math.floor(cost * 0.15), // Testing
+            Math.floor(cost * 0.10), // Management
+            Math.floor(cost * 0.10)  // Infrastructure
+        ];
+        
+        // Update Profit/Cost
+        profitChart.data.datasets[0].data = [
+            0,
+            Math.floor(cost * 0.2),
+            Math.floor(cost * 0.5),
+            Math.floor(cost * 0.8),
+            cost
+        ];
+
+        // Redraw all charts
+        timelineChart.update();
+        teamChart.update();
+        costChart.update();
+        profitChart.update();
+    }
+    
+    // Initialize charts on page load
+    initCharts();
+
+    // ===== BUTTON REDIRECTS =====
+    document.getElementById('aiAssistant').addEventListener('click', () => {
+        window.location.href = 'ai.html';
+    });
+    document.getElementById('codeGenerator').addEventListener('click', () => {
+        // Assuming the other file is named 'index.html' as per your original file
+        window.location.href = 'index.html'; 
+    });
+});
+</script>
+
+</body>
+</html>

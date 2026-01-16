@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Modern Blog</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoIF2oqcEf0gqW+pHXmKjC/0o8Ww==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+    :root {
+    --primary-color: #3f51b5; /* Indigo */
+    --secondary-color: #ff4081; /* Pink A200 */
+    --text-color: #333;
+    --light-text-color: #666;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --border-color: #e0e0e0;
+    --shadow-light: 0 4px 8px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --font-primary: 'Montserrat', sans-serif;
+    --font-secondary: 'Roboto', sans-serif;
+}
+
+/* Base Styles & Resets */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-secondary);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
+ul {
+    list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary);
+    margin-bottom: 0.8em;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+h1 { font-size: 2.8em; }
+h2 { font-size: 2.2em; }
+h3 { font-size: 1.8em; }
+
+p {
+    margin-bottom: 1em;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    text-align: center;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.primary-btn:hover {
+    background-color: #303f9f; /* Darker primary */
+    color: #fff;
+}
+
+.secondary-btn {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 20px;
+}
+
+.secondary-btn:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Header */
+header {
+    background-color: var(--card-background);
+    box-shadow: var(--shadow-light);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-primary);
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+#main-nav ul {
+    display: flex;
+    gap: 30px;
+}
+
+#main-nav ul li a {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    color: var(--light-text-color);
+    position: relative;
+}
+
+#main-nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background-color: var(--secondary-color);
+    bottom: -5px;
+    left: 0;
+    transition: width 0.3s ease;
+}
+
+#main-nav ul li a:hover::after {
+    width: 100%;
+}
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    z-index: 1001;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: var(--text-color);
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://via.placeholder.com/1500x800/222222/FFFFFF?text=Blog+Header+Background') no-repeat center center/cover;
+    color: #fff;
+    text-align: center;
+    padding: 100px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+}
+
+.hero h1 {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.hero p {
+    font-size: 1.3em;
+    margin-bottom: 40px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Sections */
+main {
+    flex-grow: 1;
+}
+
+section {
+    padding: 60px 0;
+}
+
+section:nth-of-type(even) {
+    background-color: var(--background-color);
+}
+
+section h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--secondary-color);
+    border-radius: 2px;
+}
+
+/* Post Cards */
+.post-card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure cards in grid have same height */
+}
+
+.post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.post-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.post-card .card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.post-card h3 {
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.post-card h3 a {
+    color: var(--text-color);
+}
+
+.post-card h3 a:hover {
+    color: var(--primary-color);
+}
+
+.post-card .post-meta {
+    font-size: 0.9em;
+    color: var(--light-text-color);
+    margin-bottom: 15px;
+}
+
+.post-card .btn {
+    margin-top: auto; /* Push button to bottom */
+    align-self: flex-start;
+}
+
+/* Featured Posts Carousel */
+.featured-posts {
+    padding-bottom: 0;
+}
+
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0 40px; /* Space for buttons */
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    gap: 30px;
+}
+
+.featured-card {
+    min-width: calc(100% / 3 - 20px); /* 3 cards visible, adjust for gap */
+    flex-shrink: 0;
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+.featured-card img {
+    height: 250px;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1.5em;
+    border-radius: 50%;
+    z-index: 50;
+    transition: background-color 0.3s ease;
+}
+
+.carousel-btn:hover {
+    background-color: var(--primary-color);
+}
+
+.prev-btn { left: 0; }
+.next-btn { right: 0; }
+
+/* Latest Posts Grid */
+.latest-posts .container {
+    padding-top: 0;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* Categories */
+.categories-section {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.categories-section h2 {
+    color: #fff;
+}
+
+.categories-section h2::after {
+    background-color: var(--secondary-color);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.category-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 25px 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-family: var(--font-primary);
+    font-size: 1.1em;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.category-card:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    color: #fff;
+}
+
+/* About Section */
+.about-section {
+    background-color: var(--card-background);
+}
+
+.about-section p {
+    max-width: 800px;
+    margin: 0 auto 1em auto;
+    font-size: 1.1em;
+    color: var(--light-text-color);
+}
+
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: #ddd;
+    padding: 50px 0 20px;
+    font-size: 0.9em;
+    margin-top: auto; /* Pushes footer to bottom */
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-col h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+}
+
+.footer-col ul {
+    padding: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 10px;
+}
+
+.footer-col ul li a {
+    color: #ddd;
+    transition: color 0.3s ease;
+}
+
+.footer-col ul li a:hover {
+    color: var(--secondary-color);
+}
+
+.social-links {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.social-links a {
+    color: #fff;
+    font-size: 1.5em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.social-links a:hover {
+    background-color: var(--primary-color);
+}
+
+address {
+    font-style: normal;
+    margin-top: 15px;
+}
+
+.footer-bottom {
+    border-top: 1px solid #444;
+    padding-top: 20px;
+    margin-top: 20px;
+    color: #aaa;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-medium);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    #main-nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 75px; /* Adjust based on header height */
+        left: 0;
+        width: 100%;
+        background-color: var(--card-background);
+        box-shadow: var(--shadow-medium);
+        padding: 20px 0;
+        z-index: 999;
+    }
+
+    #main-nav.active {
+        display: flex;
+    }
+
+    #main-nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    #main-nav ul li a {
+        font-size: 1.2em;
+        padding: 10px 0;
+        display: block;
+        width: fit-content;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-toggle.active span:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+    }
+    .nav-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .nav-toggle.active span:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+    }
+
+    .hero h1 {
+        font-size: 2.5em;
+    }
+    .hero p {
+        font-size: 1.1em;
+    }
+
+    .carousel-container {
+        padding: 0 10px; /* Adjust padding for smaller screens */
+    }
+
+    .carousel-track {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px; /* For scrollbar on touch devices */
+        justify-content: flex-start; /* Align items to start */
+    }
+
+    .featured-card {
+        min-width: 90%; /* Show one card prominently on smaller screens */
+        scroll-snap-align: start;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .carousel-btn {
+        top: initial;
+        bottom: -5px;
+        transform: translateY(0);
+        padding: 8px 12px;
+        font-size: 1.2em;
+        background-color: var(--primary-color);
+    }
+    .prev-btn { left: 10px; }
+    .next-btn { right: 10px; }
+
+    .posts-grid {
+        grid-template-columns: 1fr; /* Single column on small screens */
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .footer-col .social-links {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 { font-size: 2.2em; }
+    h2 { font-size: 1.8em; }
+    h3 { font-size: 1.4em; }
+
+    .hero {
+        min-height: 400px;
+        padding: 60px 20px;
+    }
+
+    .post-card img {
+        height: 180px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}
+</style>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="#home" class="logo">MyBlog</a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#featured">Featured</a></li>
+                    <li><a href="#latest">Latest Posts</a></li>
+                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container">
+                <h1>Discover, Learn, Inspire.</h1>
+                <p>Your daily dose of insights, stories, and knowledge on various topics.</p>
+                <a href="#latest" class="btn primary-btn">Read Our Latest Posts</a>
+            </div>
+        </section>
+
+        <section id="featured" class="featured-posts container">
+            <h2>Featured Articles</h2>
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <article class="post-card featured-card">
+                        <img src="https://via.placeholder.com/600x400/FF5733/FFFFFF?text=AI+Future" alt="The Future of AI in Everyday Life">
+                        <div class="card-content">
+                            <h3><a href="#">The Future of AI in Everyday Life</a></h3>
+                            <p class="post-meta">By Jane Doe | May 15, 2023 | Technology</p>
+                            <p>An in-depth look at how artificial intelligence is shaping our world, from smart homes to advanced analytics...</p>
+                            <a href="#" class="btn secondary-btn">Read More</a>
+                        </div>
+                    </article>
+                    <article class="post-card featured-card">
+                        <img src="https://via.placeholder.com/600x400/33AFFF/FFFFFF?text=Remote+Work" alt="Mastering Remote Work Productivity">
+                        <div class="card-content">
+                            <h3><a href="#">Mastering Remote Work Productivity</a></h3>
+                            <p class="post-meta">By John Smith | May 10, 2023 | Lifestyle</p>
+                            <p>Tips and tricks to stay focused and productive while working from home, avoiding common distractions...</p>
+                            <a href="#" class="btn secondary-btn">Read More</a>
+                        </div>
+                    </article>
+                    <article class="post-card featured-card">
+                        <img src="https://via.placeholder.com/600x400/33FF57/FFFFFF?text=Sustainable+Living" alt="The Art of Sustainable Living">
+                        <div class="card-content">
+                            <h3><a href="#">The Art of Sustainable Living</a></h3>
+                            <p class="post-meta">By Emily White | May 01, 2023 | Environment</p>
+                            <p>Explore practical ways to reduce your carbon footprint and live a more eco-friendly lifestyle...</p>
+                            <a href="#" class="btn secondary-btn">Read More</a>
+                        </div>
+                    </article>
+                     <article class="post-card featured-card">
+                        <img src="https://via.placeholder.com/600x400/FFC300/FFFFFF?text=Tech+Gadgets" alt="Latest Tech Gadgets Reviewed">
+                        <div class="card-content">
+                            <h3><a href="#">Latest Tech Gadgets Reviewed</a></h3>
+                            <p class="post-meta">By Tech Expert | Apr 25, 2023 | Technology</p>
+                            <p>A comprehensive review of the must-have tech gadgets of the year, from smartphones to smart home devices...</p>
+                            <a href="#" class="btn secondary-btn">Read More</a>
+                        </div>
+                    </article>
+                </div>
+                <button class="carousel-btn prev-btn" aria-label="Previous Slide">&lt;</button>
+                <button class="carousel-btn next-btn" aria-label="Next Slide">&gt;</button>
+            </div>
+        </section>
+
+        <section id="latest" class="latest-posts container">
+            <h2>Latest Posts</h2>
+            <div class="posts-grid">
+                <article class="post-card">
+                    <img src="https://via.placeholder.com/400x250/FFC300/FFFFFF?text=Web+Tools" alt="10 Essential Tools for Web Developers">
+                    <div class="card-content">
+                        <h3><a href="#">10 Essential Tools for Web Developers</a></h3>
+                        <p class="post-meta">By Jane Doe | Jun 01, 2023 | Development</p>
+                        <p>A comprehensive list of must-have tools that every web developer should consider using...</p>
+                        <a href="#" class="btn secondary-btn">Read More</a>
+                    </div>
+                </article>
+                <article class="post-card">
+                    <img src="https://via.placeholder.com/400x250/DAF7A6/FFFFFF?text=Healthy+Eating" alt="Healthy Eating Habits for Busy Professionals">
+                    <div class="card-content">
+                        <h3><a href="#">Healthy Eating Habits for Busy Professionals</a></h3>
+                        <p class="post-meta">By John Smith | May 28, 2023 | Health</p>
+                        <p>Simple yet effective strategies to maintain a healthy diet even with a demanding schedule...</p>
+                        <a href="#" class="btn secondary-btn">Read More</a>
+                    </div>
+                </article>
+                <article class="post-card">
+                    <img src="https://via.placeholder.com/400x250/FF5733/FFFFFF?text=Space+Photography" alt="Exploring the Wonders of Space Photography">
+                    <div class="card-content">
+                        <h3><a href="#">Exploring the Wonders of Space Photography</a></h3>
+                        <p class="post-meta">By Emily White | May 25, 2023 | Photography</p>
+                        <p>Dive into the mesmerizing world of astrophotography and learn how to capture cosmic beauty...</p>
+                        <a href="#" class="btn secondary-btn">Read More</a>
+                    </div>
+                </article>
+                <article class="post-card">
+                    <img src="https://via.placeholder.com/400x250/C70039/FFFFFF?text=Quantum+Computing" alt="The Rise of Quantum Computing Explained">
+                    <div class="card-content">
+                        <h3><a href="#">The Rise of Quantum Computing Explained</a></h3>
+                        <p class="post-meta">By Jane Doe | May 20, 2023 | Technology</p>
+                        <p>Demystifying quantum computing, its principles, and potential impact on various industries...</p>
+                        <a href="#" class="btn secondary-btn">Read More</a>
+                    </div>
+                </article>
+                <article class="post-card">
+                    <img src="https://via.placeholder.com/400x250/900C3F/FFFFFF?text=Mindfulness" alt="Mindfulness Techniques for Stress Reduction">
+                    <div class="card-content">
+                        <h3><a href="#">Mindfulness Techniques for Stress Reduction</a></h3>
+                        <p class="post-meta">By John Smith | May 18, 2023 | Wellness</p>
+                        <p>Practical mindfulness exercises to help manage stress and improve mental well-being...</p>
+                        <a href="#" class="btn secondary-btn">Read More</a>
+                    </div>
+                </article>
+                 <article class="post-card">
+                    <img src="https://via.placeholder.com/400x250/581845/FFFFFF?text=Investing" alt="A Beginner's Guide to Investing in Stocks">
+                    <div class="card-content">
+                        <h3><a href="#">A Beginner's Guide to Investing in Stocks</a></h3>
+                        <p class="post-meta">By Emily White | May 12, 2023 | Finance</p>
+                        <p>Everything you need to know to start your investment journey in the stock market...</p>
+                        <a href="#" class="btn secondary-btn">Read More</a>
+                    </div>
+                </article>
+            </div>
+            <div class="text-center">
+                <button id="load-more-btn" class="btn primary-btn">Load More Posts</button>
+            </div>
+        </section>
+
+        <section id="categories" class="categories-section container">
+            <h2>Browse By Category</h2>
+            <div class="category-grid">
+                <a href="#" class="category-card">Technology</a>
+                <a href="#" class="category-card">Lifestyle</a>
+                <a href="#" class="category-card">Health</a>
+                <a href="#" class="category-card">Development</a>
+                <a href="#" class="category-card">Photography</a>
+                <a href="#" class="category-card">Environment</a>
+                <a href="#" class="category-card">Finance</a>
+                <a href="#" class="category-card">Wellness</a>
+                <a href="#" class="category-card">Food</a>
+                <a href="#" class="category-card">Travel</a>
+                <a href="#" class="category-card">Education</a>
+                <a href="#" class="category-card">Art & Design</a>
+            </div>
+        </section>
+
+        <section id="about" class="about-section">
+            <div class="container text-center">
+                <h2>About MyBlog</h2>
+                <p>MyBlog is dedicated to providing high-quality, engaging content across a wide range of topics. Our mission is to inspire, educate, and entertain our readers with well-researched articles and captivating stories.</p>
+                <p>We believe in the power of knowledge and the importance of sharing diverse perspectives. Join our community and embark on a journey of continuous learning!</p>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3>MyBlog</h3>
+                <p>Your source for compelling stories and insightful articles.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#featured">Featured</a></li>
+                    <li><a href="#latest">Latest Posts</a></li>
+                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#about">About Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact Us</h3>
+                <p>Email: info@myblog.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+                <address>
+                    123 Blog Street, <br>
+                    Knowledge City, BK 00101
+                </address>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <p>&copy; 2023 MyBlog. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Scroll to top">&#9650;</button>
+
+    <script src="script.js">
+        document.addEventListener('DOMContentLoaded', () => {
+    // 1. Mobile Navigation Toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const mainNav = document.getElementById('main-nav');
+
+    if (navToggle && mainNav) {
+        navToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            navToggle.classList.toggle('active');
+            document.body.classList.toggle('no-scroll'); // Optional: prevent scrolling when nav is open
+        });
+
+        // Close nav when a link is clicked (for single page navigation)
+        mainNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav.classList.remove('active');
+                navToggle.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            });
+        });
+    }
+
+    // 2. Featured Posts Carousel
+    const carouselTrack = document.querySelector('.carousel-track');
+    const prevBtn = document.querySelector('.carousel-btn.prev-btn');
+    const nextBtn = document.querySelector('.carousel-btn.next-btn');
+    const featuredCards = document.querySelectorAll('.featured-card');
+    let currentIndex = 0;
+
+    if (carouselTrack && prevBtn && nextBtn && featuredCards.length > 0) {
+        let cardWidth = featuredCards[0].offsetWidth + 30; // Card width + gap
+
+        function updateCarousel() {
+            carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : featuredCards.length - 1;
+            updateCarousel();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex < featuredCards.length - 1) ? currentIndex + 1 : 0;
+            updateCarousel();
+        });
+
+        let autoPlayInterval = setInterval(() => {
+            currentIndex = (currentIndex < featuredCards.length - 1) ? currentIndex + 1 : 0;
+            updateCarousel();
+        }, 5000); // Change slide every 5 seconds
+
+        carouselTrack.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+        carouselTrack.addEventListener('mouseleave', () => {
+            autoPlayInterval = setInterval(() => {
+                currentIndex = (currentIndex < featuredCards.length - 1) ? currentIndex + 1 : 0;
+                updateCarousel();
+            }, 5000);
+        });
+
+        // Adjust card width on resize
+        window.addEventListener('resize', () => {
+            cardWidth = featuredCards[0].offsetWidth + 30; // Recalculate cardWidth on resize
+            updateCarousel(); // Update carousel position based on new width
+        });
+    }
+
+
+    // 3. "Load More Posts" Functionality (Simulated)
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const postsGrid = document.querySelector('.posts-grid');
+    const initialPostsCount = 6; // Number of posts already loaded in HTML
+    let loadedPosts = initialPostsCount;
+
+    // A list of dummy posts to simulate loading more
+    const dummyPosts = [
+        {
+            img: 'https://via.placeholder.com/400x250/8E44AD/FFFFFF?text=Post+7', 
+            title: 'Understanding Blockchain Technology',
+            meta: 'By John Smith | May 08, 2023 | Technology',
+            excerpt: 'A beginner-friendly guide to blockchain, cryptocurrencies, and their potential applications...',
+            link: '#'
+        },
+        {
+            img: 'https://via.placeholder.com/400x250/2C3E50/FFFFFF?text=Post+8',
+            title: 'The Benefits of Daily Meditation',
+            meta: 'By Emily White | May 05, 2023 | Wellness',
+            excerpt: 'Discover how a consistent meditation practice can improve your mental clarity and reduce stress...',
+            link: '#'
+        },
+        {
+            img: 'https://via.placeholder.com/400x250/F39C12/FFFFFF?text=Post+9',
+            title: 'A Guide to Sustainable Travel',
+            meta: 'By Jane Doe | Apr 30, 2023 | Lifestyle',
+            excerpt: 'Tips for eco-conscious travelers to minimize their impact and enjoy responsible adventures...',
+            link: '#'
+        },
+        {
+            img: 'https://via.placeholder.com/400x250/E74C3C/FFFFFF?text=Post+10',
+            title: 'The Psychology of Color in Marketing',
+            meta: 'By Mark Johnson | Apr 28, 2023 | Marketing',
+            excerpt: 'Explore how different colors influence consumer behavior and brand perception...',
+            link: '#'
+        },
+        {
+            img: 'https://via.placeholder.com/400x250/27AE60/FFFFFF?text=Post+11',
+            title: 'Home Gardening for Beginners',
+            meta: 'By Sarah Lee | Apr 22, 2023 | Lifestyle',
+            excerpt: 'Start your own urban garden with these easy-to-follow steps and tips...',
+            link: '#'
+        }
+    ];
+
+    if (loadMoreBtn && postsGrid) {
+        loadMoreBtn.addEventListener('click', () => {
+            // Simulate loading new posts
+            const postsToAdd = 3; // Number of posts to add per click
+            const startIndex = loadedPosts - initialPostsCount; // Calculate start index for dummyPosts
+            const newPostsToShow = dummyPosts.slice(startIndex, startIndex + postsToAdd);
+
+            newPostsToShow.forEach(post => {
+                const article = document.createElement('article');
+                article.classList.add('post-card');
+                article.innerHTML = `
+                    <img src="${post.img}" alt="${post.title}">
+                    <div class="card-content">
+                        <h3><a href="${post.link}">${post.title}</a></h3>
+                        <p class="post-meta">${post.meta}</p>
+                        <p>${post.excerpt}</p>
+                        <a href="${post.link}" class="btn secondary-btn">Read More</a>
+                    </div>
+                `;
+                postsGrid.appendChild(article);
+            });
+
+            loadedPosts += newPostsToShow.length;
+
+            // Hide button if all dummy posts are loaded
+            if (loadedPosts >= (initialPostsCount + dummyPosts.length)) {
+                loadMoreBtn.style.display = 'none';
+            }
+        });
+    }
+
+    // 4. Scroll-to-top button
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+    if (scrollToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) { // Show button after scrolling 300px
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // 5. Smooth scrolling for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+                 // Calculate offset for fixed header
+                const headerOffset = document.querySelector('header').offsetHeight;
+                const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+                const offsetPosition = elementPosition - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});
+    </script>
+</body>
+</html>
